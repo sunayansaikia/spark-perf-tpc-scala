@@ -20,7 +20,9 @@ object RunTpcds2 {
       "reason", "ship_mode", "store", "store_returns", "store_sales", "time_dim", "warehouse", "web_page", "web_returns",
       "web_sales", "web_site")
     val rootDir = "s3a://data/spark/tpcds/" + databaseName
+    //val rootDir = "file:///var/tmp/tpcds/gendata"
     for (i <- 0 to tableNames.length - 1) {
+      //sqlContext.read.csv(rootDir + "/" + tableNames{i} + ".csv").createOrReplaceTempView(tableNames{i})
       sqlContext.read.parquet(rootDir + "/" + tableNames{i}).createOrReplaceTempView(tableNames{i})
     }
 
@@ -31,7 +33,8 @@ object RunTpcds2 {
 
     //===== Customized a query
     //val queries = new CustomizedQuery().q1
-    val queries = tpcds.tpcds2_4Queries // queries to run.
+    val query_filter = Seq("q1-v2.4", "q2-v2.4") // run subset of queries
+    val queries = tpcds.tpcds2_4Queries.filter(q => query_filter.contains(q.name)) // queries to run.
     //=============
 
     val timeout = 24 * 60 * 60 // timeout, in seconds.
